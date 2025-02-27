@@ -54,20 +54,25 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Amazon ECR') {
-			steps {
-				script {
-					withDockerRegistry([credentialsId: 'ecr:ap-south-1:ecr-credentials', url: "https://390844780898.dkr.ecr.ap-south-1.amazonaws.com"]) {
-						echo 'Tagging and Pushing Docker Image to ECR...'
+        pipeline {
+			agent any
+
+    stages {
+				stage('Push Docker Image to Amazon ECR') {
+					steps {
+						script {
+							withCredentials([aws(credentialsId: 'ecr:ap-south-1:ecr-credentials')]) {
+								echo 'Tagging and Pushing Docker Image to ECR...'
                         sh '''
-                            docker images
-                            docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 390844780898.dkr.ecr.ap-south-1.amazonaws.com
+                            docker tag my-image:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/my-repo:latest
+                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/my-repo:latest
                         '''
-                        echo 'Docker Image Pushed to Amazon ECR Successfully!'
                     }
                 }
             }
         }
+    }
+}
     }
 }
