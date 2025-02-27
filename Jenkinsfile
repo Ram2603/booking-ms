@@ -1,13 +1,14 @@
 pipeline {
-
 	agent any
 
     options {
-		buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
+		// Keep only the latest 3 builds and artifacts
+        buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
     }
 
     tools {
-		maven 'mvn_3.9.9'
+		// Ensure that this tool is configured in Jenkins (Global Tool Configuration)
+        maven 'mvn_3.9.9'
     }
 
     stages {
@@ -18,6 +19,7 @@ pipeline {
                 echo 'Code Compilation Completed Successfully!'
             }
         }
+
         stage('Code Package') {
 			steps {
 				echo 'Creating WAR Artifact...'
@@ -25,3 +27,5 @@ pipeline {
                 echo 'WAR Artifact Created Successfully!'
             }
         }
+    }
+}
