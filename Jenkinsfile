@@ -2,12 +2,10 @@ pipeline {
 	agent any
 
     options {
-		// Keep only the latest 3 builds and artifacts
         buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
     }
 
     tools {
-		// Ensure that this tool is configured in Jenkins (Global Tool Configuration)
         maven 'mvn_3.9.9'
     }
 
