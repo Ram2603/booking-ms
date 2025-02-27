@@ -2,31 +2,33 @@ pipeline {
     agent any
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+        buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
     }
 
     tools {
-        maven 'mvn_3.9.9'
+        maven 'mvn_3.9.9'  // Ensure you have this tool configured in Jenkins
     }
+
     stages {
         stage('Code Compilation') {
             steps {
-                echo 'Compiling the code...'
+                echo 'Starting Code Compilation...'
                 sh 'mvn clean compile'
+                echo 'Code Compilation Completed Successfully!'
             }
         }
-
-        stage('JUnit Execution') {
+        stage('Code QA Execution') {
             steps {
-                echo 'Executing JUnit tests...'
-                sh 'mvn test'
+                echo 'Running JUnit Test Cases...'
+                sh 'mvn clean test'
+                echo 'JUnit Test Cases Completed Successfully!'
             }
         }
-
-        stage('Code Packaging') {
+        stage('Code Package') {
             steps {
-                echo 'Packaging the code...'
-                sh 'mvn package'
+                echo 'Creating WAR Artifact...'
+                sh 'mvn clean package'
+                echo 'WAR Artifact Created Successfully!'
             }
         }
     }
