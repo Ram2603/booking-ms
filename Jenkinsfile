@@ -45,7 +45,7 @@ pipeline {
 				script {
 					withCredentials([string(credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]) {
 						echo 'Logging in to Docker Hub...'
-                        sh 'docker login docker.io -u docker26031997 -p ${dockerhubCred}'
+                        sh 'echo ${dockerhubCred} | docker login docker.io -u docker26031997 --password-stdin'
                         echo 'Pushing Docker Image to Docker Hub...'
                         sh 'docker push docker26031997/booking-ms:latest'
                         echo 'Docker Image Pushed to Docker Hub Successfully!'
@@ -61,8 +61,8 @@ pipeline {
 						echo 'Tagging and Pushing Docker Image to ECR...'
                         sh '''
                             docker images
-                            docker tag booking-ms:latest 533267238276.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                            docker push 533267238276.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
                         '''
                         echo 'Docker Image Pushed to Amazon ECR Successfully!'
                     }
