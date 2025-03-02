@@ -83,21 +83,7 @@ pipeline {
                 }
             }
         }
-         stage('Push Docker Image to Amazon ECR') {
-			steps {
-				script {
-					withDockerRegistry([credentialsId: 'ecr:ap-south-1:ecr-credentials', url: "https://390844780898.dkr.ecr.ap-south-1.amazonaws.com"]) {
-						echo 'Tagging and Pushing Docker Image to ECR...'
-                        sh '''
-                            docker images
-                            docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                        '''
-                        echo 'Docker Image Pushed to Amazon ECR Successfully!'
-                    }
-                }
-           }
-         }
+
         stage('Clean Up Local Docker Images') {
 			steps {
 				echo 'Cleaning Up Local Docker Images...'
