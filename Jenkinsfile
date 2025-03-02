@@ -33,9 +33,11 @@ pipeline {
                 echo 'Docker Image Build Completed!'
             }
         }
+
         stage('Docker Image Scanning') {
 			steps {
-				echo 'Scanning Docker Image '
+				echo 'Scanning Docker Image...'
+                // Add actual scanning commands (e.g., Trivy, Clair, etc.)
                 echo 'Docker Image Scanning Completed!'
             }
         }
@@ -45,7 +47,7 @@ pipeline {
 				script {
 					withCredentials([string(credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]) {
 						echo 'Logging in to Docker Hub...'
-                        sh 'docker login docker.io -u docker26031997 -p ${dockerhubCred}'
+                        sh "docker login docker.io -u docker26031997 -p ${dockerhubCred}"
                         echo 'Pushing Docker Image to Docker Hub...'
                         sh 'docker push docker26031997/booking-ms:latest'
                         echo 'Docker Image Pushed to Docker Hub Successfully!'
@@ -54,25 +56,19 @@ pipeline {
             }
         }
 
-        pipeline {
-			agent any
-
-    stages {
-				stage('Push Docker Image to Amazon ECR') {
-					steps {
-						script {
-							withCredentials([aws(credentialsId: 'ecr:ap-south-1:ecr-credentials')]) {
-								echo 'Tagging and Pushing Docker Image to ECR...'
+        stage('Push Docker Image to Amazon ECR') {
+			steps {
+				script {
+					withDockerRegistry([credentialsId: 'ecr:ap-south-1:ecr-credentials', url: "https://390844780898.dkr.ecr.ap-south-1.amazonaws.com"]) {
+						echo 'Tagging and Pushing Docker Image to ECR...'
                         sh '''
-                            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 390844780898.dkr.ecr.ap-south-1.amazonaws.com
-                            docker tag my-image:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/my-repo:latest
-                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/my-repo:latest
+                            docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
                         '''
+                        echo 'Docker Image Pushed to Amazon ECR Successfully!'
                     }
                 }
             }
         }
-    }
-}
     }
 }
