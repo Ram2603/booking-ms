@@ -59,14 +59,23 @@ pipeline {
         stage('Push Docker Image to Amazon ECR') {
 			steps {
 				script {
-					// Authenticate Docker to AWS ECR using AWS CLI
-                    echo 'Tagging and Pushing Docker Image to ECR...'
-                    sh '''
-                        $(aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 390844780898.dkr.ecr.ap-south-1.amazonaws.com)
-                        docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                        docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
-                    '''
-                    echo 'Docker Image Pushed to Amazon ECR Successfully!'
+					// Ensure AWS credentials are available for ECR login
+                    withCredentials([usernamePassword(credentialsId: 'ecr-credentials',
+                                                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                                        passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+						echo 'Tagging and Pushing Docker Image to ECR...'
+
+                        // Authenticate Docker to AWS ECR using AWS CLI
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                            $(aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 390844780898.dkr.ecr.ap-south-1.amazonaws.com)
+                            docker tag booking-ms:latest 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            docker push 390844780898.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                        '''
+                        echo 'Docker Image Pushed to Amazon ECR Successfully!'
+                    }
                 }
             }
         }
